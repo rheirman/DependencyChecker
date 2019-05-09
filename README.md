@@ -28,6 +28,12 @@ This file should be added to the About folder of your mod, and should have a sim
 ```
 In this example (taken from Giddy-up! Mechanoids), Giddy-up! Core, and What the hack?! are listed as dependencies, and if they're missing, users will get the following warning dialog: 
 
+![Dialog for missing dependencies](https://i.imgur.com/cPjryLW.png)
+
+Or if the load order is not right for certain dependencies, users will get this dialog: 
+
+![Dialog for wrong load order](https://i.imgur.com/O2cNi5O.png)
+
 ## Credits
 
 - UnlimitedHugs. This mod is a heavily modified verion of HugsLibChecker created by UnlimitedHugs. So credits go to him for creating that mod!
