@@ -1,5 +1,6 @@
 /build/
 *.suo
+.vs/*
 *.user
 _ReSharper.*/
 *.sdf

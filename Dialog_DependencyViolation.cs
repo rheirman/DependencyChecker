@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
@@ -7,6 +8,7 @@ namespace DependencyChecker
 {
 	public class Dialog_DependencyViolation : Window {
 		private const string DownloadButtonCaption = "Download";
+        private const string WarningLabel = "Note: most mods don't have a warning dialog like this. Therefore, always take a look at the mod's page to see if there are any dependencies before installing it.";
 		private readonly Color DownloadButtonColor = Color.green;
         private static float lineHeight = 24f;
         private readonly Vector2 DownloadButtonSize = new Vector2(160, lineHeight - 2f);
@@ -31,11 +33,16 @@ namespace DependencyChecker
 			doCloseX = false;
 			forcePause = true;
 			absorbInputAroundWindow = true;
-		}
+            //doWindowBackground = true;
+            onlyOneOfTypeAllowed = false;
+
+
+        }
 
 		public override void PostClose() {
 			base.PostClose();
-			if (closedLogWindow) {
+            List <Window> windows = Find.WindowStack.Windows.ToList<Window>();
+			if (windows.Count((Window w) => w is Dialog_DependencyViolation) == 0) {
 				EditWindow_Log.wantsToOpen = true;
 			}
 		}
@@ -51,16 +58,16 @@ namespace DependencyChecker
 			var titleRect = new Rect(inRect.x, inRect.y, inRect.width, 40);
 			Widgets.Label(titleRect, title);
 			Text.Font = GameFont.Small;
-            Widgets.Label(new Rect(inRect.x, inRect.y + titleRect.height, inRect.width, inRect.height - DownloadButtonSize.y - titleRect.height), message);
-            float offset = lineHeight + inRect.y + titleRect.height;
+            Widgets.Label(new Rect(inRect.x, inRect.y + titleRect.height, inRect.width, lineHeight * 2), message);
+            float offset = lineHeight * 2 + inRect.y + titleRect.height;
             foreach (Dependency dep in violatedDependencies)
             {
-                Widgets.Label(new Rect(inRect.x, inRect.y + titleRect.height + offset, inRect.width/2, lineHeight), "- " + dep.modName);
+                Widgets.Label(new Rect(inRect.x, offset, inRect.width/2, lineHeight), "- " + dep.modName);
                 if (showDownloadButton)
                 {
                     var prevColor = GUI.color;
                     GUI.color = DownloadButtonColor;
-                    var downloadButtonRect = new Rect(inRect.x + inRect.width - DownloadButtonSize.x, inRect.y + titleRect.height + offset, DownloadButtonSize.x, DownloadButtonSize.y);
+                    var downloadButtonRect = new Rect(inRect.x + inRect.width - DownloadButtonSize.x, offset, DownloadButtonSize.x, DownloadButtonSize.y);
                     if (Widgets.ButtonText(downloadButtonRect, DownloadButtonCaption))
                     {
                         Close();
@@ -70,13 +77,14 @@ namespace DependencyChecker
                     GUI.color = prevColor;
                 }
                 offset += lineHeight;
-                if(inRect.height < offset + CloseButSize.y)
-                {
-                    inRect.height = offset + CloseButSize.y;
-                }
+            }
+            if (inRect.height < offset + CloseButSize.y + lineHeight * 3)
+            {
+                inRect.height = offset + CloseButSize.y + lineHeight * 3;
             }
             Rect closeButtonRect;
-		    closeButtonRect = new Rect(inRect.width/2f - CloseButSize.x/2f, inRect.height - CloseButSize.y, CloseButSize.x, CloseButSize.y);
+            Widgets.Label(new Rect(inRect.x, inRect.height - CloseButSize.y - lineHeight * 3, inRect.width, lineHeight * 3), WarningLabel);
+            closeButtonRect = new Rect(inRect.width/2f - CloseButSize.x/2f, inRect.height - CloseButSize.y, CloseButSize.x, CloseButSize.y);
 			if (Widgets.ButtonText(closeButtonRect, "CloseButton".Translate())) {
 				Close();
 			}

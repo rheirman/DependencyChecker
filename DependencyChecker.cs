@@ -9,18 +9,19 @@ namespace DependencyChecker
     // do not move or rename. Has detection by full class name
     [StaticConstructorOnStartup]
     public class DependencyChecker : Mod {
+        int key = 0;
 		private const string LibraryModName = "DependencyChecker";
 		private const string MissingLibraryTitle = "Missing dependencies";
 		private const string MissingLibraryMessage = "<b>{0}</b> depends on the following mods. Make sure to install them, and place them ABOVE {0} in the load order!";
 		private const string ImproperLoadOrderTitle = "Improper mod load order";
-		private const string ImproperLoadOrderMessage = "The following mods should be placed ABOVE <b>{0}</b> in the load order: ";
+		private const string ImproperLoadOrderMessage = "The following mods should be placed ABOVE <b>{0}</b> in the load order. Please re-order your mod list to prevent errors.";
 
 		// do not rename- referenced by reflection
 		public static bool ChecksPerformed;
 
 		// entry point
 		public DependencyChecker(ModContentPack content) : base(content) {
-            Log.Message("DependencyChecker called!");
+            Log.Message("DependencyChecker!");
 			RunAllChecks();
 		}
 
@@ -43,7 +44,7 @@ namespace DependencyChecker
                         List<Dependency> misloadedDependencies = MisLoadedDependencies(mod);
                         if (misloadedDependencies.Count > 0)
                         {
-                            ScheduleDialog(ImproperLoadOrderTitle, ImproperLoadOrderMessage, misloadedDependencies, false);
+                            ScheduleDialog(ImproperLoadOrderTitle, String.Format(ImproperLoadOrderMessage, mod.name), misloadedDependencies, false);
                         }
                     }
                    
@@ -87,7 +88,7 @@ namespace DependencyChecker
             {
                 return new List<Dependency>();
             }
-            List<Dependency> missingDependencies = mod.file.Dependencies;
+            List<Dependency> missingDependencies = mod.file.Dependencies.ListFullCopy();
 
             foreach (ModContentPack pack in LoadedModManager.RunningMods ) {
                 missingDependencies.RemoveAll((Dependency d) => d.modName == pack.Name);
@@ -100,7 +101,7 @@ namespace DependencyChecker
             {
                 return new List<Dependency>();
             }
-            List<Dependency> missingDependencies = mod.file.Dependencies;
+            List<Dependency> misLoadedDependencies = mod.file.Dependencies.ListFullCopy();
             bool modEncountered = false;
             foreach (ModContentPack pack in LoadedModManager.RunningMods)
             {
@@ -108,12 +109,12 @@ namespace DependencyChecker
                 {
                     modEncountered = true;
                 }
-                if (modEncountered)
+                if (!modEncountered)
                 {
-                    missingDependencies.RemoveAll((Dependency d) => d.modName == pack.Name);
+                    misLoadedDependencies.RemoveAll((Dependency d) => d.modName == pack.Name);
                 }
             }
-            return missingDependencies;
+            return misLoadedDependencies;
         }
         private static string GetAssemblyTitle (Assembly assembly)
         {
@@ -123,7 +124,8 @@ namespace DependencyChecker
 		private void ScheduleDialog(string title, string message, List<Dependency> violatedDependencies, bool showDownloadButton) {
 			LongEventHandler.QueueLongEvent(() => {
 				Find.WindowStack.Add(new Dialog_DependencyViolation(title, message, violatedDependencies, showDownloadButton));
-			}, null, false, null);
+			}, key.ToString(), false, null);
+            key++;
 		}
 		
 		private class LibraryRelatedMod {
