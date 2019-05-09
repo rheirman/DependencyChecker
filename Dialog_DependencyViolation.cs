@@ -58,8 +58,8 @@ namespace DependencyChecker
 			var titleRect = new Rect(inRect.x, inRect.y, inRect.width, 40);
 			Widgets.Label(titleRect, title);
 			Text.Font = GameFont.Small;
-            Widgets.Label(new Rect(inRect.x, inRect.y + titleRect.height, inRect.width, lineHeight * 2), message);
-            float offset = lineHeight * 2 + inRect.y + titleRect.height;
+            Widgets.Label(new Rect(inRect.x, inRect.y + titleRect.height, inRect.width, lineHeight * 3), message);
+            float offset = lineHeight * 3 + inRect.y + titleRect.height;
             foreach (Dependency dep in violatedDependencies)
             {
                 Widgets.Label(new Rect(inRect.x, offset, inRect.width/2, lineHeight), "- " + dep.modName);

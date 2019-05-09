@@ -14,7 +14,7 @@ namespace DependencyChecker
 		private const string MissingLibraryTitle = "Missing dependencies";
 		private const string MissingLibraryMessage = "<b>{0}</b> depends on the following mods. Make sure to install them, and place them ABOVE {0} in the load order!";
 		private const string ImproperLoadOrderTitle = "Improper mod load order";
-		private const string ImproperLoadOrderMessage = "The following mods should be placed ABOVE <b>{0}</b> in the load order. Please re-order your mod list to prevent errors.";
+		private const string ImproperLoadOrderMessage = "The following mods should be placed ABOVE <b>{0}</b> in the load order. Please re-order your mod list to prevent severe errors.";
 
 		// do not rename- referenced by reflection
 		public static bool ChecksPerformed;
